@@ -1,55 +1,21 @@
-import os
-from googleapiclient.discovery import build
-import nltk
-from nltk.tokenize import sent_tokenize
-from sumy.parsers.plaintext import PlaintextParser
-from sumy.nlp.tokenizers import Tokenizer
-from sumy.summarizers.lsa import LsaSummarizer
+from PIL import Image 
+from pytesseract import pytesseract 
 
-# YouTube API key
-API_KEY = 'AIzaSyALdmnX__qx0CYNxus1hjGd8cF7LPqSuZ8'  # Replace with your API key
+# Defining paths to tesseract.exe 
+# and the image we would be using 
+path_to_tesseract = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+image_path = r"C:\Users\Hari Perumal\Downloads\jai2image.jpg"
 
-# Function to get video transcript
-def get_video_transcript(video_id):
-    youtube = build('youtube', 'v3', developerKey=API_KEY)
-    
-    # Fetch video details
-    request = youtube.videos().list(part='contentDetails', id=video_id)
-    response = request.execute()
+# Opening the image & storing it in an image object 
+img = Image.open(image_path) 
 
-    # Get the video duration
-    video_duration = response['items'][0]['contentDetails']['duration']
-    print(f'Duration of the video: {video_duration}')
-    
-    # Return a placeholder transcript (You will need to implement actual transcript fetching)
-    return "This is a sample transcript of the video."
+# Providing the tesseract executable 
+# location to pytesseract library 
+pytesseract.tesseract_cmd = path_to_tesseract 
 
-# Function to summarize the transcript
-def summarize_transcript(transcript):
-    nltk.download('punkt')
-    
-    # Parse the transcript
-    parser = PlaintextParser.from_string(transcript, Tokenizer("english"))
-    
-    # Create a summarizer
-    summarizer = LsaSummarizer()
-    
-    # Summarize the text (adjust the number of sentences as needed)
-    summary = summarizer(parser.document, 3)  # Summarize to 3 sentences
-    return ' '.join(str(sentence) for sentence in summary)
+# Passing the image object to image_to_string() function 
+# This function will extract the text from the image 
+text = pytesseract.image_to_string(img) 
 
-# Main function
-def main():
-    video_url = input("Enter the YouTube video URL: ")
-    video_id = video_url.split('v=')[1].split('&')[0]  # Extract video ID from URL
-    
-    transcript = get_video_transcript(video_id)
-    print("\nTranscript:")
-    print(transcript)
-
-    summary = summarize_transcript(transcript)
-    print("\nSummary:")
-    print(summary)
-
-if __name__ == "_main_":
-    main()
+# Displaying the extracted text 
+print(text[:-1])
